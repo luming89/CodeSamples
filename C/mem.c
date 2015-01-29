@@ -11,8 +11,6 @@
 #include <unistd.h>
 #include "mem.h"
 
-
-
 #define DEBUG 0
 #define MERGE 1
 /***** Policies *****/
@@ -28,7 +26,6 @@ typedef struct __header_t
     int magic;
 } header_t;
 
-
 typedef struct __node_t
 {
     int size;
@@ -37,7 +34,6 @@ typedef struct __node_t
 } node_t;
 
 node_t* head = 0;
-
 int m_error = 0;
 int init = 0;
 
@@ -46,7 +42,7 @@ void merge_prev(node_t* node_to_merge)
     node_t* prev_node;
     if(node_to_merge->prev==NULL)
     {
-	   return;
+	return;
     }
     else
     {
@@ -76,9 +72,6 @@ void merge_next(node_t* node_to_merge)
         }
     }
 }
-
-
-
 
 void insert_inorder(node_t* node_to_insert)
 {
@@ -129,12 +122,9 @@ void insert_inorder(node_t* node_to_insert)
     		    if(MERGE) merge_next(node_to_insert);
 
     		}
-		    return;
+		return;
 	    }
-
 	} 
-    
-
     }
 }
 
@@ -150,7 +140,7 @@ int Mem_Init(int sizeOfRegion)
 
     if(init)
     {
-	   return -1;
+	return -1;
     }
 
     if(sizeOfRegion<=0)
@@ -162,21 +152,21 @@ int Mem_Init(int sizeOfRegion)
     
     if(DEBUG)
     {
-	   printf("Page size is %d\n",page_size);
+	printf("Page size is %d\n",page_size);
     }
     quotient = sizeOfRegion/page_size;
     remainder = sizeOfRegion%page_size;
 
     if(DEBUG)
     {
-	   printf("Quotient is %d, remainder is %d\n",quotient,remainder);
+	printf("Quotient is %d, remainder is %d\n",quotient,remainder);
     }
     if(remainder) 
         quotient++;
     number_bytes = quotient*page_size;
     if(DEBUG)
     {
-	   printf("Number of byte to be request is %d\n",number_bytes);
+	printf("Number of byte to be request is %d\n",number_bytes);
     }
     head = mmap(NULL,number_bytes,PROT_READ | PROT_WRITE,MAP_PRIVATE,fd,0);
     
@@ -187,7 +177,7 @@ int Mem_Init(int sizeOfRegion)
     }
     if(DEBUG)
     {
-	   printf("Address of request memory is %p\n",head);
+	printf("Address of request memory is %p\n",head);
     }
     close(fd);
     head->size = number_bytes;
@@ -219,7 +209,7 @@ void *Mem_Alloc(int size, int style)
 
     if(size%8!=0)
     {
-	   size_alloc = ((size/8)+1)*8;
+	size_alloc = ((size/8)+1)*8;
     }
     if(DEBUG)
     {
@@ -229,7 +219,7 @@ void *Mem_Alloc(int size, int style)
     curr = head;
     while((curr!=NULL)&&(found==0))
     {
-	   if(DEBUG) printf("Current node: %p.\n",curr);
+	if(DEBUG) printf("Current node: %p.\n",curr);
     	if(curr->size >= size_alloc+sizeof(header_t))
     	{
     	    tmp_size = curr->size;//save the info about this node
@@ -251,7 +241,7 @@ void *Mem_Alloc(int size, int style)
     	    found = 1;
     	    
     	}
-	   if(found==0) curr = curr->next;
+	if(found==0) curr = curr->next;
     }
    
     result = header+1;
@@ -261,17 +251,17 @@ void *Mem_Alloc(int size, int style)
     tmp->prev = tmp_prev;
     if(tmp->prev==NULL)
     {
-	   head = tmp;
+	head = tmp;
     }
     else
     {
-	   tmp->prev->next = tmp;
+	tmp->prev->next = tmp;
     }
 
     if(DEBUG)
     {
-	   printf("Allocated address: %p\n",result);
-	   printf("Mem_Alloc ends.\n");
+	printf("Allocated address: %p\n",result);
+	printf("Mem_Alloc ends.\n");
     }
     return result;
 	
