@@ -1,27 +1,23 @@
 //
-//  viewHome.m
-//  VISS
+//  HomeViewController.m
 //
-//  Created by 欢欢 范 on 14-6-23.
-//  Improved by Luming on Jan. 4, 2015
-//  Copyright (c) 2014年 tiger. All rights reserved.
+//  Created by Luming on 12-27-2014.
+//  Copyright (c) 2014 Luming. All rights reserved.
 //
 
 #import "HomeViewController.h"
 #import "AppDelegate.h"
-//#import "MCTakePic.h"
+#import "MCTakePic.h"
 #import "LeGlobalObj.h"
 #import "LoginViewController.h"
-//#import "YMAPIReader3.h"
-//#import "Config.h"
-//#import "PolyoreViewController.h"             // already imported in .h?
+#import "YMAPIReader3.h"
+#import "Config.h"
 #import "FirstPageViewController.h"
-//#import "PAImageView.h"
-//#import "UIImageView+WebCache.h"
-//#import "SecondDetailViewController.h"
+#import "PAImageView.h"
+#import "UIImageView+WebCache.h"
+#import "SecondDetailViewController.h"
 #import "ShoppingCartViewController.h"
-#import "MeViewController.h"    // already imported in .h?
-//#import "SecondViewController2.h"               // WTF is this? Do we have 2 SecondViewController.h???
+#import "MeViewController.h" 
 #import "Macros.h"
 
 @interface HomeViewController ()
@@ -37,32 +33,26 @@
     NSLog(@"HomeViewNib%@",nibNameOrNil);
 #endif
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
     return self;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    //CGSize size=[[UIScreen mainScreen]bounds].size;
-    //CGFloat screenHeight=size.height;
 
-    
     NSString *filename1=[[LeGlobalObj sharedSingleton] GetFileName:@"username.txt"];
     if (![[LeGlobalObj sharedSingleton] is_file_exist:filename1])
     {
-        //FirstPageViewController *frmobj=[[FirstPageViewController alloc] init]; // WTF is this?
-        ///[self.view addSubview:frmobj.view];
-        //frmobj.view.frame=self.view.frame;
+        FirstPageViewController *frmobj=[[FirstPageViewController alloc] init]; // WTF is this?
+        /[self.view addSubview:frmobj.view];
+        frmobj.view.frame=self.view.frame;
     }
-    //AppDelegate *appdelegate=[[UIApplication sharedApplication]delegate];
-    //userid=@"1";
-    //appdelegate.loginuserid=@"1";
-    //appdelegate.loginusername=@"请登录";
-    //appdelegate.loginavatar=@"1";
-    //[LeGlobalObj sharedSingleton].userid=@"1";
+    AppDelegate *appdelegate=[[UIApplication sharedApplication]delegate];
+    userid=@"1";
+    appdelegate.loginuserid=@"1";
+    appdelegate.loginusername=@"Please login";
+    appdelegate.loginavatar=@"1";
+    [LeGlobalObj sharedSingleton].userid=@"1";
     [self showInitPage];
     [self autologin];
 
@@ -116,34 +106,11 @@
     [self.view sendSubviewToBack:ShoppingCartView.view];
 //    [self.view sendSubviewToBack:TabView3.view];
     [self.view sendSubviewToBack:TabView4.view];
-//    top=0;
-//
-// 
-//    [[LeGlobalObj sharedSingleton].SetPage.view setHidden:YES];
-//
-//    lab_login_title1.text=@"";
-//    
-//    lab_login_title3.text=@"";
-//    lab_login_name.text=@"";
-//    
-//    [myimageface setHidden:YES];
-////    [myimageface setHidden:YES];
-//
-//    NSString *filename1=[[LeGlobalObj sharedSingleton] GetFileName:@"username.txt"];
-//    if (![[LeGlobalObj sharedSingleton] is_file_exist:filename1]) {
-//        FirstPageViewController *frmobj=[[FirstPageViewController alloc] init];
-//        [self.view addSubview:frmobj.view];
-//        frmobj.view.frame=self.view.frame;
-//    }
 
  
     // Do any additional setup after loading the view from its nib.
 }
-//
-//- (UIStatusBarStyle)preferredStatusBarStyle
-//{
-//    return UIStatusBarStyleLightContent;
-//}
+
 
 -(void)backlogin{
     FirstPageViewController *frmobj=[[FirstPageViewController alloc] init];
@@ -551,15 +518,9 @@
 
 -(void)showPerson:(UIViewController *)vobj
 {
-//    [TabHome.view setHidden:YES];
-//    [TabView1.view setHidden:YES];
-//    [TabView2.view setHidden:YES];
-//    [TabView3.view setHidden:YES];
-//    [TabView4.view setHidden:YES];
-    
-    //[[LeGlobalObj sharedSingleton].SetPage.view removeFromSuperview];
-    
-    if (navP !=nil) {
+
+    if (navP !=nil)
+    {
         navP=nil;
     }
     navP= [[UINavigationController alloc] init];
@@ -605,42 +566,16 @@
  
 }
 
--(void)removeView{
+-(void)removeView
+{
     
-        [nav.view removeFromSuperview];
+    [nav.view removeFromSuperview];
      
 }
-/*-(IBAction)click_home:(id)sender
-{
-#if DEBUG
-    NSLog(@"Home clicked");
-#endif
-    //[[LeGlobalObj sharedSingleton].SetPage showlayer];
-}
--(IBAction)click_notice:(id)sender
-{
-    
-        //[[LeGlobalObj sharedSingleton].SetPage showlayer];
-  //  [[LeGlobalObj sharedSingleton].SetPage showlayernotice:nil];
-}
 
--(IBAction)click_home1:(id)sender
-{
-   // [self showHome];
-    //[LeGlobalObj sharedSingleton].filter_str=@" and a.fromplat=0  ";
-      // [TabHome loadnewormoredata];
-}
-
--(IBAction)click_home2:(id)sender
-{
-   //     [self showHome];
-  //   [LeGlobalObj sharedSingleton].filter_str=@"  and a.fromplat=1";
-  //  TabHome.refreshing=YES;
-  //  [TabHome loadnewormoredata];
-}*/
 -(void)refresh
 {
-   //    TabHome.refreshing=YES;
-  //  [TabHome loadnewormoredata];
+    TabHome.refreshing=YES;
+    [TabHome loadnewormoredata];
 }
 @end

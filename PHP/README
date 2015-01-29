@@ -1,0 +1,1 @@
+This is a a little web page tool that help edit Excel file. The Excel file will be showed in table and Google scatter chart. Table cells are editable. New Excel file will be generated in the server side and downloaded to the user.

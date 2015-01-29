@@ -1,0 +1,3 @@
+Aircraft object hierarchy is the core object hierarchy in my 3D game - Air Battle. 
+
+Mesh is the mesh data structure I used in my modern OpenGL game engine.
