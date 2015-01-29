@@ -1,0 +1,1 @@
+mySh.c is the linux shell I wrote for my second project of my OS course. mem is a library of memory functions equivalent to malloc, free, and so on.

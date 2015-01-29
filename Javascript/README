@@ -1,0 +1,1 @@
+bezier.js is a script I wrote for my Computer Graphics assignment. It calculatesa cubic bezier curve according to input parameters and display it in an SVG graph which can be embedded in an web page file.
