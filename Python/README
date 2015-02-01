@@ -1,1 +1,1 @@
-This Web Crawler is designed to support our iOS app - sofity. It uses the Spider algorithm to traverse a web site and collects apperal product infos. It will imitate the AJAX request if the web page is dynamically generated. Keyword: BFS Regular Expression AJAX
+This Web Crawler is designed to support our iOS app - sofity. It uses the Spider algorithm to traverse a web site and collects apperal product infos. It will imitate the AJAX request if the web page is asynchronous. Keyword: BFS Regular Expression AJAX
