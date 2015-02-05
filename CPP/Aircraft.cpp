@@ -13,11 +13,6 @@ Aircraft::Aircraft(char* name, int num_order) : GrObject(name, num_order)
 	destroyable = true;
 }
 
-void Aircraft::draw(DrawingState* d)
-{
-
-}
-
 void Aircraft::getCamera(Matrix camera) // override GrObject's get Camera
 {
 
@@ -51,9 +46,7 @@ void Aircraft::getCamera(Matrix camera) // override GrObject's get Camera
 
 
 	copyMatrix(tmpTransform, camera); // copy transform to camera
-	invertMatrix(camera); // what's this for?
-
-
+	invertMatrix(camera); 
 }
 
 
@@ -91,7 +84,7 @@ void Airship::draw(DrawingState* ds)//DrawingState* d)
 	cout << "Draw airship\n";
 #endif
 
-	char* error; // not elegant
+	char* error; 
 	GLuint program = loadShader("../Shaders/airship.vs", "../Shaders/airship.fs", error, NULL);
 	if (texture == "Procedure")
 	{
@@ -102,7 +95,6 @@ void Airship::draw(DrawingState* ds)//DrawingState* d)
 		fetchTexture(texture.c_str());
 	}
 	
-	//GLuint program = loadShader("airship.vs", "airship.fs", error);
 	if (error)
 		std::cerr << error << std::endl;
 	glUseProgram(program);
@@ -169,8 +161,6 @@ void Helicopter::getCamera(Matrix camera) // override the GrObject's get Camera
 	Matrix delta, newT;
 	Matrix t4, t5, t6; // adjust the transform
 
-	
-
 	rotMatrix(t4, 'Y', -direction); // adjust the transform
 	multMatrix(t4, transform, t6);  // t3 is result
 
@@ -194,21 +184,12 @@ void Helicopter::getCamera(Matrix camera) // override the GrObject's get Camera
 
 
 	copyMatrix(tmpTransform, camera);   // copy transform to camera
-	invertMatrix(camera); 				// what's this for?
-
-
+	invertMatrix(camera);
 }
 
 void Helicopter::draw(DrawingState* ds) {
 	long unixTime = ds->timeOfDay;
-	/*if (speed == 10) {
-		// Stop blade rotation
-	}
-	else if (unixTime % speed == 0) {*/
-		bladeRotation +=  speed;
-	//}
-
-	//glScaled(.2, .2, .2);
+	bladeRotation +=  speed;
 
 	 glPushMatrix();
 	 drawTale();
