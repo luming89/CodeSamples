@@ -3,3 +3,6 @@ Aircraft object hierarchy is the core object hierarchy in my 3D game - Air Battl
 Mesh is the mesh data structure I used in my modern OpenGL game engine.
 
 loopInv.cpp and GCRA.cpp are loop invariant and graph-coloring register allocation LLVM passes.
+
+sortLinkedList.cpp is a merge sort algorithm for sorting singly-linked list.
+

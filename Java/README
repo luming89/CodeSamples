@@ -1,0 +1,5 @@
+AST.java defines the nodes of the abstract-syntax tree that represents a CSX program. It performs name analysis, type checking and unparse the abstract-syntax tree to source program.
+
+Codegen.java is the code generator called by the abstract-syntax tree and generates the human-readable assembly code.
+
+AStarSearch is the A* search algorithm I wrote for my Artificial Intelligence Homework 1. Use priority queue and heuristic function to guide the search.
