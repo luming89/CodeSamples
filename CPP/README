@@ -1,3 +1,5 @@
+TheGreatEscape.cpp is an AI program I wrote for a world-wide AI contest host by www.codingame.com.
+
 Aircraft object hierarchy is the core object hierarchy in my 3D game - Air Battle. 
 
 Mesh is the mesh data structure I used in my modern OpenGL game engine.

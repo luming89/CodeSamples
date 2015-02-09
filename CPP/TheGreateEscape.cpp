@@ -7,6 +7,8 @@
 
 #define BFS//ASTAR//
 
+#define VERSION 1.5
+
 using namespace std;
 
 class Position
@@ -121,8 +123,14 @@ vector<Position> pathFinding(const Player& player, const std::vector<Wall>& wall
     vector<Position> res;
     vector<vector<bool> > closed(9,vector<bool>(9,false));
     vector<State*> garbage;
+    #if DEBUG
+        cerr<<"Going to find a path for player #"<<player.id<<endl;
+        cerr<<"Start point: "<<player.curr.x<<", "<<player.curr.y<<endl;
+        cerr<<"Destination point: "<<player.dest.x<<", "<<player.dest.y<<endl;
+    #endif
+
     #ifdef BFS /*************** BFS **************/
-    cerr<<"Using BFS!"<<endl;
+    //cerr<<"Using BFS!"<<endl;
     State* opt=NULL;
     int minPath=std::numeric_limits<int>::max();
     queue<State*> q;
@@ -135,18 +143,16 @@ vector<Position> pathFinding(const Player& player, const std::vector<Wall>& wall
         q.pop();
         if(checkDest(tmp->pos, player.dest, player.id))
         {  
-            
-            cerr<<"Find a path in BFS, gValue is "<<tmp->gValue<<", shortest path length is "<<h<<endl;
-            if(tmp->gValue<minPath)
+            while(tmp->prev->prev)
             {
-                opt = tmp;
-                minPath = tmp->gValue;
-                if(minPath==h)
-                {
-                    break;
-                }
-                   
+                //err<<"Prev is "<<tmp->prev<<endl;
+                res.push_back(tmp->pos);
+                tmp=tmp->prev;
+                //cerr<<"Pos of tmp is "<<tmp->pos.x<<", "<<tmp->pos.y<<endl;
             }
+            res.push_back(tmp->pos);
+            break;
+    
         }
         vector<Position> succ = getSuccessors(tmp->pos,walls);
         for(auto it : succ)
@@ -158,24 +164,14 @@ vector<Position> pathFinding(const Player& player, const std::vector<Wall>& wall
             }
         }
     }
-    while(opt->prev->prev)
-    {
-        //err<<"Prev is "<<tmp->prev<<endl;
-        res.push_back(opt->pos);
-        opt=opt->prev;
-        cerr<<"Pos of opt is "<<opt->pos.x<<", "<<opt->pos.y<<endl;
-    }
-    res.push_back(opt->pos);
+    
+    //res.push_back(opt->pos);
     
     #else /*************** ASTAR **************/
-    cerr<<"Using ASTAR!"<<endl;
+    //cerr<<"Using ASTAR!"<<endl;
     auto lambda = [](const State* s1, const State* s2){return s1->hValue>s2->hValue;};
     priority_queue<State*,vector<State*>,decltype(lambda)> pq(lambda);
-    #if DEBUG==10
-        cerr<<"Going to find a path for player #"<<player.id<<endl;
-        cerr<<"Start point: "<<player.curr.x<<", "<<player.curr.y<<endl;
-        cerr<<"Destination point: "<<player.dest.x<<", "<<player.dest.y<<endl;
-    #endif
+    
     pq.push(new State(player.curr,calcH(player.curr,player.dest,player.id)));
     closed[player.curr.x][player.curr.y]=true;
     while(pq.empty()==false) // find a path
@@ -218,8 +214,24 @@ vector<Position> pathFinding(const Player& player, const std::vector<Wall>& wall
     return res;
 }  
 
+bool checkWallInBound(const Wall& w)
+{
+    if(w.ori=='V')
+    {
+        if(w.pos.x<=0||w.pos.x>8||w.pos.y<0||w.pos.y>=8)
+            return false;
+    }
+    else // 'H'
+    {
+        if(w.pos.x<0||w.pos.x>=8||w.pos.y<=0||w.pos.y>8)
+            return false;
+    }
+    return true;
+}
+
 Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wall>& walls, bool& wallPlaceFlag, const std::vector<Wall>& originalWalls)
 {
+    
     #if DEBUG
         cerr<<"Try to place a wall for player #"<<players[opid].id<<endl;
     #endif
@@ -229,55 +241,64 @@ Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wa
     int opPrevETA = players[opid].ETA;
     int myPrevETA = players[myid].ETA;
     vector<Position> path = pathFinding(players[opid],walls);
+    for(int i = -1;i<=1;i++)
+    {
+        for(int j = -1;j<=1;j++)
+        {
+            Wall tmp;
+            tmp = Wall(Position(players[opid].curr.x+i,players[opid].curr.y+j),'V');
+            if(checkWallInBound(tmp))
+                wallsToBeChecked.push_back(tmp);
+            tmp = Wall(Position(players[opid].curr.x+i,players[opid].curr.y+j),'H');
+            if(checkWallInBound(tmp))
+                wallsToBeChecked.push_back(tmp);
+        }
+    }
+/*    
+    if(players[opid].curr.y>0) // 0
+        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y-1),'V'));
+    if(players[opid].curr.y>0) // 0
+        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y-1),'V'));  
+    if(players[opid].curr.y<8) // 1
+        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y),'V'));
+    if(players[opid].curr.x<7&&players[opid].curr.y>0) // 2
+        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x+1,players[opid].curr.y-1),'V'));
+    if(players[opid].curr.x<7&&players[opid].curr.y<8) // 3
+        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x+1,players[opid].curr.y),'V'));
+    if(players[opid].curr.x>0) // 4
+        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x-1,players[opid].curr.y),'H')); 
+    if(players[opid].curr.x<8) // 5
+        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y),'H'));   
+    if(players[opid].curr.x>0&&players[opid].curr.y<7) // 6
+        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x-1,players[opid].curr.y+1),'H'));   
+    if(players[opid].curr.x<8&&players[opid].curr.y<7) // 7
+        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y+1),'H')); 
+    */
     
-    if(opid==0)
-    {
-        if(path[0].y<8)
-            wallsToBeChecked.push_back(Wall(Position(path[0].x,path[0].y),'V'));   
-        if(path[0].y>0)
-            wallsToBeChecked.push_back(Wall(Position(path[0].x,path[0].y-1),'V'));
-        //if(players[opid].curr.x<8)
-            //wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y),'H'));   
-        //if(players[opid].curr.y<8)
-            //wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y+1),'H'));
-    }
-    else if(opid==1)
-    {
-        if(players[opid].curr.y<8)
-            wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y),'V'));   
-        if(players[opid].curr.y>0)
-            wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y-1),'V'));
-        if(players[opid].curr.x<8)
-            wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y),'H'));   
-        if(players[opid].curr.y<8)
-            wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y+1),'H'));
-    }
-    else
-    {
-        if(path[0].x<8)
-            wallsToBeChecked.push_back(Wall(Position(path[0].x,path[0].y),'H'));
-        if(path[0].x>0)
-            wallsToBeChecked.push_back(Wall(Position(path[0].x-1,path[0].y),'H'));
-    }
     cerr<<"There are "<<wallsToBeChecked.size()<<" walls to be checked"<<endl;
 
-    for(auto i:wallsToBeChecked) // ckeck potential walls
+    for(auto i:wallsToBeChecked) // ckeck conflict of potential walls
     {
         bool flag = true;
         for(auto j:originalWalls)
         {
             if(abs(i.pos.x-j.pos.x)<=1&&i.pos.y==j.pos.y&&i.ori==j.ori&&i.ori=='H'||
                i.pos.x==j.pos.x&&abs(i.pos.y-j.pos.y)<=1&&i.ori==j.ori&&i.ori=='V'||
-               i.pos.x-j.pos.x==-1&&i.pos.y-j.pos.y==1&&i.ori=='V'&&j.ori=='H'||
-               i.pos.x-j.pos.x==1&&i.pos.y-j.pos.y==-1&&i.ori=='H'&&j.ori=='V'
+               i.pos.x-j.pos.x==1&&i.pos.y-j.pos.y==-1&&i.ori=='V'&&j.ori=='H'||
+               i.pos.x-j.pos.x==-1&&i.pos.y-j.pos.y==1&&i.ori=='H'&&j.ori=='V'
                 )
             {
                 flag=false;
-                cerr<<"Place wall("<<i.pos.x<<", "<<i.pos.y<<") failed due to conflict!"<<endl;
-            }       
+                cerr<<"Place wall("<<i.pos.x<<", "<<i.pos.y<<", "<<i.ori<<") failed due to conflict!"<<endl;
+            }   
+
         }
         if(flag)
+        {
+            cerr<<"Wall("<<i.pos.x<<", "<<i.pos.y<<", "<<i.ori<<") is valid!"<<endl;
             wallsChecked.push_back(i);
+        }
+            
     }
     cerr<<"There are "<<wallsChecked.size()<<" valid walls to be tested"<<endl;
 
@@ -308,8 +329,19 @@ Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wa
             res = i;
         }
     }
-    if(max>=2)
+    int wallsMax;
+    if(players.size()==3)
     {
+        wallsMax = 6;
+    }
+    else
+    {
+        wallsMax = 10;
+    }
+    
+    if(max>=min((wallsMax-players[myid].wallsLeft+1),2))//2)//
+    {
+        //threshold++;
         wallPlaceFlag=true;
         cerr<<"Place wall succeed, benefit is "<<max<<endl;
         return res;
@@ -416,10 +448,13 @@ int main()
             
             
             #if DEBUG
-                if(i==id)
-                    cerr<<"ETA for player #"<<i<<"(myself): "<<players[i].ETA<<endl;
-                else
-                    cerr<<"ETA for player #"<<i<<" : "<<players[i].ETA<<endl;
+                if(players[i].alive)
+                {
+                    if(i==id&&players[i].alive)
+                        cerr<<"ETA for player #"<<i<<"(myself): "<<players[i].ETA<<endl;
+                    else
+                        cerr<<"ETA for player #"<<i<<" : "<<players[i].ETA<<endl;
+                }
             #endif
         }
         #if DEBUG==10
@@ -439,9 +474,10 @@ int main()
                     cerr<<"My ETA is "<<players[id].ETA<<endl;
                 else
                     cerr<<"player #"<<i<<" ETA is "<<players[i].ETA<<endl;
+            
                 if(players[i].ETA<players[id].ETA&&players[id].wallsLeft)
                 {
-                    cerr<<"Player #"<<i<<" is ahead of me!"<<endl;
+                    cerr<<"Player #"<<i<<" is no behind of me, place a wall for him!"<<endl;
                     wall = placeWall(players,i,id,walls,placeWallFlag,originalWalls);
                     if(placeWallFlag == true)
                         break;
