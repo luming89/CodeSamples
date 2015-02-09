@@ -14,6 +14,7 @@ public class AStarSearcher extends Searcher {
 	 * @see Searcher
 	 * @param maze initial maze.
 	 */
+	private final boolean DEBUG=false;
 	public AStarSearcher(Maze maze) {
 		super(maze);
 	}
@@ -55,6 +56,13 @@ public class AStarSearcher extends Searcher {
 			StateFValuePair min = open.poll();
 			expanded.add(min);	
 			noOfNodesExpanded+=1;
+			if(DEBUG)
+                        {
+
+                                maze.setOneSquare(min.getState().getSquare(), '.');
+                                IO.printOutput(maze, getCost(), getNoOfNodesExpanded());
+                                maze.setOneSquare(min.getState().getSquare(), ' ');
+                        }
 			closed[min.getState().getX()][min.getState().getY()]=true;
 			
 			if(min.getState().isGoal(maze))
