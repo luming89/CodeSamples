@@ -69,6 +69,11 @@ int calcH(const Position& curr, const Position& dest, const int id)
         return abs(curr.y-dest.y);
 }
 
+int calcManhattanDist(const Position& curr, const Position& dest)
+{
+    return abs(curr.x-dest.x)+abs(curr.y-dest.y);
+}
+
 bool checkDest(const Position& curr, const Position& dest, const int id)
 {
     if(id<2)
@@ -124,9 +129,9 @@ vector<Position> pathFinding(const Player& player, const std::vector<Wall>& wall
     vector<vector<bool> > closed(9,vector<bool>(9,false));
     vector<State*> garbage;
     #if DEBUG
-        cerr<<"Going to find a path for player #"<<player.id<<endl;
-        cerr<<"Start point: "<<player.curr.x<<", "<<player.curr.y<<endl;
-        cerr<<"Destination point: "<<player.dest.x<<", "<<player.dest.y<<endl;
+        //cerr<<"Going to find a path for player #"<<player.id<<endl;
+        //cerr<<"Start point: "<<player.curr.x<<", "<<player.curr.y<<endl;
+        //cerr<<"Destination point: "<<player.dest.x<<", "<<player.dest.y<<endl;
     #endif
 
     #ifdef BFS /*************** BFS **************/
@@ -143,14 +148,13 @@ vector<Position> pathFinding(const Player& player, const std::vector<Wall>& wall
         q.pop();
         if(checkDest(tmp->pos, player.dest, player.id))
         {  
-            while(tmp->prev->prev)
+            while(tmp->prev)
             {
                 //err<<"Prev is "<<tmp->prev<<endl;
                 res.push_back(tmp->pos);
                 tmp=tmp->prev;
                 //cerr<<"Pos of tmp is "<<tmp->pos.x<<", "<<tmp->pos.y<<endl;
             }
-            res.push_back(tmp->pos);
             break;
     
         }
@@ -165,7 +169,6 @@ vector<Position> pathFinding(const Player& player, const std::vector<Wall>& wall
         }
     }
     
-    //res.push_back(opt->pos);
     
     #else /*************** ASTAR **************/
     //cerr<<"Using ASTAR!"<<endl;
@@ -205,9 +208,6 @@ vector<Position> pathFinding(const Player& player, const std::vector<Wall>& wall
             }
         }
     }
-    
-    
-    
     #endif // if ALG
     for(auto it:garbage) delete it;
     std::reverse(res.begin(),res.end());
@@ -229,9 +229,11 @@ bool checkWallInBound(const Wall& w)
     return true;
 }
 
-Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wall>& walls, bool& wallPlaceFlag, const std::vector<Wall>& originalWalls)
+Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wall>& walls, 
+    bool& wallPlaceFlag, const std::vector<Wall>& originalWalls, int numAlive,
+    bool numPlayerChanged,int benefitThreshold)
 {
-    
+    cerr<<"BenefitThreshold in placeWall is "<<benefitThreshold<<endl;
     #if DEBUG
         cerr<<"Try to place a wall for player #"<<players[opid].id<<endl;
     #endif
@@ -240,10 +242,11 @@ Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wa
     vector<Wall> wallsChecked;
     int opPrevETA = players[opid].ETA;
     int myPrevETA = players[myid].ETA;
+    
     vector<Position> path = pathFinding(players[opid],walls);
-    for(int i = -1;i<=1;i++)
+    for(int i = -4;i<=4;i++)
     {
-        for(int j = -1;j<=1;j++)
+        for(int j = -4;j<=4;j++)
         {
             Wall tmp;
             tmp = Wall(Position(players[opid].curr.x+i,players[opid].curr.y+j),'V');
@@ -254,26 +257,6 @@ Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wa
                 wallsToBeChecked.push_back(tmp);
         }
     }
-/*    
-    if(players[opid].curr.y>0) // 0
-        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y-1),'V'));
-    if(players[opid].curr.y>0) // 0
-        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y-1),'V'));  
-    if(players[opid].curr.y<8) // 1
-        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y),'V'));
-    if(players[opid].curr.x<7&&players[opid].curr.y>0) // 2
-        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x+1,players[opid].curr.y-1),'V'));
-    if(players[opid].curr.x<7&&players[opid].curr.y<8) // 3
-        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x+1,players[opid].curr.y),'V'));
-    if(players[opid].curr.x>0) // 4
-        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x-1,players[opid].curr.y),'H')); 
-    if(players[opid].curr.x<8) // 5
-        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y),'H'));   
-    if(players[opid].curr.x>0&&players[opid].curr.y<7) // 6
-        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x-1,players[opid].curr.y+1),'H'));   
-    if(players[opid].curr.x<8&&players[opid].curr.y<7) // 7
-        wallsToBeChecked.push_back(Wall(Position(players[opid].curr.x,players[opid].curr.y+1),'H')); 
-    */
     
     cerr<<"There are "<<wallsToBeChecked.size()<<" walls to be checked"<<endl;
 
@@ -289,20 +272,21 @@ Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wa
                 )
             {
                 flag=false;
-                cerr<<"Place wall("<<i.pos.x<<", "<<i.pos.y<<", "<<i.ori<<") failed due to conflict!"<<endl;
+                //cerr<<"Place wall("<<i.pos.x<<", "<<i.pos.y<<", "<<i.ori<<") failed due to conflict!"<<endl;
             }   
 
         }
         if(flag)
         {
-            cerr<<"Wall("<<i.pos.x<<", "<<i.pos.y<<", "<<i.ori<<") is valid!"<<endl;
+            //cerr<<"Wall("<<i.pos.x<<", "<<i.pos.y<<", "<<i.ori<<") is valid!"<<endl;
             wallsChecked.push_back(i);
         }
             
     }
-    cerr<<"There are "<<wallsChecked.size()<<" valid walls to be tested"<<endl;
-
+    //cerr<<"There are "<<wallsChecked.size()<<" valid walls to be tested"<<endl;
+    int opNextETAMax;
     int max=0;
+    int manhattanDist=std::numeric_limits<int>::max();
     for(auto i:wallsChecked)
     {
         vector<Wall> tmp = walls; 
@@ -318,15 +302,46 @@ Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wa
         }
         int opNextETA = pathFinding(players[opid], tmp).size();
         int myNextETA = pathFinding(players[myid], tmp).size();
-        #if DEBUG
+        #if DEBUG==10
             cerr<<"ETA increased "<<opNextETA-opPrevETA<<" for player #"<<opid<<endl;
             cerr<<"ETA increased "<<myNextETA-myPrevETA<<" for myself"<<endl;
         #endif
-        
-        if(opNextETA-opPrevETA>max&&myNextETA<=myPrevETA&&myNextETA)
+        if(numAlive==3)
         {
-            max = opNextETA-opPrevETA;
-            res = i;
+            int tmpManhattanDist = calcManhattanDist(i.pos,players[opid].curr);
+            if(opNextETA-opPrevETA>=max&&myNextETA<=myPrevETA&&myNextETA&&opNextETA)
+            {
+                if(opNextETA-opPrevETA>max)
+                {
+                    max = opNextETA-opPrevETA;
+                    res = i;
+                    opNextETAMax = opNextETA;
+                    manhattanDist = tmpManhattanDist;
+                }
+                else  //
+                {
+                    if(tmpManhattanDist<manhattanDist)
+                    {
+                        max = opNextETA-opPrevETA;
+                        res = i;
+                        opNextETAMax = opNextETA;
+                        manhattanDist = tmpManhattanDist;
+                    }
+                    
+                }
+                
+            }
+        }
+        else
+        {
+            int tmpManhattanDist = calcManhattanDist(i.pos,players[opid].curr);
+            if(opNextETA-opPrevETA-(myNextETA-myPrevETA)>=max&&myNextETA&&opNextETA)
+            {
+                max = opNextETA-opPrevETA-(myNextETA-myPrevETA);
+                res = i;
+                opNextETAMax = opNextETA;
+                manhattanDist = tmpManhattanDist;
+            }
         }
     }
     int wallsMax;
@@ -338,12 +353,47 @@ Wall placeWall(const vector<Player>& players, int opid, int myid, std::vector<Wa
     {
         wallsMax = 10;
     }
-    
-    if(max>=min((wallsMax-players[myid].wallsLeft+1),2))//2)//
+    benefitThreshold = min(2,benefitThreshold);
+    int threshold = 0;
+    if(wallsMax==players[myid].wallsLeft||numPlayerChanged)
+        threshold = 1;
+    else
+        threshold = 1+benefitThreshold;
+    cerr<<"Max is "<<max<<", threshold is "<<threshold<<endl;
+    cerr<<"Player #"<<opid<<" current position("<<players[opid].curr.x<<", "<<players[opid].curr.y<<")"<<endl;
+    cerr<<"Player #"<<opid<<" predicted next position("<<path[0].x<<", "<<path[0].y<<")"<<endl;
+    if(max>=threshold)
     {
         //threshold++;
-        wallPlaceFlag=true;
-        cerr<<"Place wall succeed, benefit is "<<max<<endl;
+        Player tmpPlayer = players[opid];
+        tmpPlayer.curr = path[0];
+        std::vector<Wall> tmpWalls = walls;
+        
+        if(res.ori=='V')
+        {
+            tmpWalls.push_back(Wall(res.pos,'V',false));
+            tmpWalls.push_back(Wall(Position(res.pos.x,res.pos.y+1),'V',false));
+        }
+        else
+        {
+            tmpWalls.push_back(Wall(res.pos,'H',false));
+            tmpWalls.push_back(Wall(Position(res.pos.x+1,res.pos.y),'H',false));
+        }
+        
+        vector<Position> newPath = pathFinding(tmpPlayer,tmpWalls);
+        int tmpNextETA= newPath.size();
+        cerr<<"If the wall is placed next round, his newETA(curETA) would be "<<tmpNextETA<<"("<<opNextETAMax<<")"<<endl;
+        if(tmpNextETA>=opNextETAMax)
+        {
+            wallPlaceFlag=false;
+            cerr<<"Delay wall ("<<res.pos.x<<", "<<res.pos.y<<", "<<res.ori<<") to trap him deeper!"<<endl;
+        }
+        else
+        {
+            wallPlaceFlag=true;
+            cerr<<"Place wall ("<<res.pos.x<<", "<<res.pos.y<<", "<<res.ori<<") succeed, benefit is "<<max<<endl;
+        }
+        
         return res;
     }
     else
@@ -363,11 +413,15 @@ int main()
     cin >> w >> h >> playerCount >> id; cin.ignore();
     cerr << "My ID is: " << id << endl;
     string res = "ERROR";
-    
+    int round=0;
+    int prevNumAlive=playerCount;
+    bool prevPlaceWallFlag=false;
+    int benefitThreshold=0;
     // game loop
     while (1) 
     {
-        
+        //cerr<<"Round "<<round<<" starts!"<<endl;
+        round++;
         Position curr;
         Position dest;
         std::vector<Player> players;
@@ -383,7 +437,7 @@ int main()
             int y; // y-coordinate of the player
             int wallsLeft; // number of walls available for the player
             cin >> x >> y >> wallsLeft; cin.ignore();
-            #if DEBUG
+            #if DEBUG==10
                 cerr<<"Got input: "<<x<<", "<<y<<", "<<wallsLeft<<endl;
             #endif
             if(wallsLeft!=-1)
@@ -467,20 +521,44 @@ int main()
         Wall wall;
         for (int i = 0; i < playerCount ; i++) 
         {
-            if(players[i].alive)
+            if(players[i].alive&&i!=id&&round>6&&players[id].wallsLeft)
             {
-                cerr<<"i is "<<i<<", playerCount is "<<playerCount<<endl;
-                if(i==id)
-                    cerr<<"My ETA is "<<players[id].ETA<<endl;
-                else
-                    cerr<<"player #"<<i<<" ETA is "<<players[i].ETA<<endl;
-            
-                if(players[i].ETA<players[id].ETA&&players[id].wallsLeft)
+               
+                bool numPlayerChanged = false;
+                if(players[i].ETA<=players[id].ETA) 
                 {
+                    if(players[i].ETA==players[id].ETA&&id==0) // if i'm id 0, don't slow down, just run!
+                        continue;
                     cerr<<"Player #"<<i<<" is no behind of me, place a wall for him!"<<endl;
-                    wall = placeWall(players,i,id,walls,placeWallFlag,originalWalls);
+                    
+                    if(numAlive!=prevNumAlive)
+                    {
+                        numPlayerChanged =true;
+                        prevNumAlive=numAlive;
+                    }
+                    wall = placeWall(players,i,id,walls,placeWallFlag,originalWalls,numAlive,numPlayerChanged,benefitThreshold);
                     if(placeWallFlag == true)
+                    {
+                        //prevPlaceWallFlag = true;
+                        benefitThreshold++;
                         break;
+                    }
+                    else
+                    {
+                        benefitThreshold=1;
+                    }
+                }
+                else 
+                {
+                    cerr<<"Try to find a surprise wall!";
+                    // Make a try to see if we can get surprise
+                    wall = placeWall(players,i,id,walls,placeWallFlag,originalWalls,numAlive,numPlayerChanged,4);
+                    if(placeWallFlag == true)
+                    {
+                        cerr<<"This wall is from surprise!!!"<<endl;
+                        break;
+                    }
+                            
                 }
             }
         }
@@ -505,6 +583,6 @@ int main()
         if(placeWallFlag)
             cout << wall.pos.x<<" "<<wall.pos.y<<" "<<wall.ori<<" Stop there!" << endl;
         else
-            cout << res <<" Have fun!"<< endl; // action: LEFT, RIGHT, UP, DOWN or "putX putY putOrientation" to place a wall
+            cout << res <<" Have fun! By Asgard"<< endl; // action: LEFT, RIGHT, UP, DOWN or "putX putY putOrientation" to place a wall
     }
 }
