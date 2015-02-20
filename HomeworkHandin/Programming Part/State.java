@@ -48,7 +48,10 @@ public class State {
 	public ArrayList<State> getSuccessors(boolean[][] closed, Maze maze) 
 	{
 		// FILL THIS METHOD
-
+		if(maze == null)
+		{
+     		   throw new IllegalArgumentException("Maze cannot be null");
+    		}
 		// TODO check all four neighbors (up, right, down, left)
 		ArrayList<State> res = new ArrayList<State>();
 		int rows = maze.getNoOfRows();
