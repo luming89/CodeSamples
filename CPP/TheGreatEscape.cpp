@@ -1,4 +1,5 @@
 /**************************************************************************/
+/* The Great Escape AI Contest host by www.codingame.com                  */
 /* Author: Luming Zhang                                                   */
 /* Date 02/20/2015                                                        */
 /**************************************************************************/ 
@@ -22,7 +23,7 @@
 #define BFS//ASTAR//
 #define TIMING do{double elapsed_secs = double(clock() - beginTiming) / CLOCKS_PER_SEC; cerr<<"Elapsed time: "<<elapsed_secs*1000<<"ms in "<<__FUNCTION__<<" line: "<<__LINE__<<endl;} while(0);
 
-#define VERSION 13/1133
+#define VERSION 12/1133
 
 using namespace std;
 

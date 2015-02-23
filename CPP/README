@@ -1,6 +1,6 @@
-TheGreatEscape.cpp is an AI program I wrote for a world-wide AI contest host by www.codingame.com.
+TheGreatEscape.cpp is an AI program I wrote for a world-wide AI contest host by www.codingame.com. It finally ranks at 12/1133. It uses enhanced-BFS to find safest and shortest path to destination and uses customized Minimax algorithm to decide when and how to place the walls to delay opponents and protect myself. Video demo of this game and my AI is available on www.luminghub.com
 
-Aircraft object hierarchy is the core object hierarchy in my 3D game - Air Battle. 
+Aircraft object hierarchy is the core object hierarchy in my 3D game - Air Battle. Video demo of this game is available on www.luminghub.com
 
 Mesh is the mesh data structure I used in my modern OpenGL game engine.
 
