@@ -1,4 +1,4 @@
-//===--------------- liveVars.cpp - Project 2 for CS 701 ---------------===//
+//===--------------- loopInv.cpp - Project 3 for CS 701 ---------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,8 +7,8 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file is a skeleton of an implementation for the liveVars
-// pass of Univ. Wisconsin-Madison's CS 701 Project 2.
+// This file is a skeleton of an implementation for the loopInv
+// pass of Univ. Wisconsin-Madison's CS 701 Project 3.
 //
 //===----------------------------------------------------------------------===//
 //
