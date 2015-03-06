@@ -1,0 +1,1 @@
+No, we don't need to search the entire tree every time. If max_value method already found it optimal value(1.0), it doesn't need to continue to search if successors are checked from largest to smallest.
