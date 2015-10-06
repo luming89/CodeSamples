@@ -1,0 +1,33 @@
+heart:
+EXPERIMENT_SIZE is 0.050000
+Accuracy average: 0.608738, accuracyMin: 0.456311, accuracyMax: 0.747573
+EXPERIMENT_SIZE is 0.100000
+Accuracy average: 0.709709, accuracyMin: 0.563107, accuracyMax: 0.786408
+EXPERIMENT_SIZE is 0.200000
+Accuracy average: 0.724272, accuracyMin: 0.631068, accuracyMax: 0.796117
+EXPERIMENT_SIZE is 0.500000
+Accuracy average: 0.713592, accuracyMin: 0.640777, accuracyMax: 0.786408
+EXPERIMENT_SIZE is 1
+Accuracy average: 0.689320, accuracyMin: 0.689320, accuracyMax: 0.689320
+
+m2 Accuracy: 0.679612
+m5 Accuracy: 0.699029
+m10 Accuracy: 0.728155
+m20 Accuracy: 0.737864
+
+diabetes:
+EXPERIMENT_SIZE is 1
+Accuracy average: 0.690000, accuracyMin: 0.690000, accuracyMax: 0.690000
+EXPERIMENT_SIZE is 0.050000
+Accuracy average: 0.635000, accuracyMin: 0.590000, accuracyMax: 0.690000
+EXPERIMENT_SIZE is 0.100000
+Accuracy average: 0.694000, accuracyMin: 0.630000, accuracyMax: 0.740000
+EXPERIMENT_SIZE is 0.200000
+Accuracy average: 0.702000, accuracyMin: 0.670000, accuracyMax: 0.790000
+EXPERIMENT_SIZE is 0.500000
+Accuracy average: 0.669000, accuracyMin: 0.600000, accuracyMax: 0.740000
+
+m2 Accuracy: 0.680000
+m5 Accuracy: 0.690000
+m10 Accuracy: 0.690000
+m20 Accuracy: 0.730000
